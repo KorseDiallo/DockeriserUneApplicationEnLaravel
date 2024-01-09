@@ -1,17 +1,21 @@
+version: "3.8"
 services:
+    # Mysql database container
     db:
         image: mysql
-        container_name: mysql_container
+        container_name: db_mysql_laravel
         restart: always
         volumes:
             - db-data:/var/lib/mysql
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         networks:
-            - dev
+            - tutorial
+
+    # phpmyadmin container
     phpmyadmin:
         image: phpmyadmin
-        container_name: phpmyadmin_docker_laravel
+        container_name: tutorial_phpmyadmin
         restart: always
         depends_on:
             - db
@@ -20,23 +24,24 @@ services:
         environment:
             PMA_HOST: db
         networks:
-            - dev
+            - tutorial
 
+    #  apache project container
     www:
-        build: php
-        container_name: laravel_container
+        build: 
+            context: .
+            dockerfile : ./php/Dockerfile
+        container_name: tutorial_symfony
         ports:
-            - "8741:80"
+          - "8741:80"
         volumes:
-            - ./php/vhosts:/etc/apache2/sites-enabled
-            - ./:/var/www
+            - .:/var/www/html
         restart: always
         networks:
-            - dev
+            - tutorial
+
 networks:
-    dev:
+    tutorial:
+
 volumes:
     db-data:
-
-
-

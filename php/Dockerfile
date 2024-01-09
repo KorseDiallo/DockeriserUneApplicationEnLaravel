@@ -1,33 +1,30 @@
-# Utilise ici une image PHP avec Apache
 FROM php:8.1-apache
 
-# Installe les dépendances nécessaires
-RUN apt-get update && \
-    apt-get install -y \
-    libicu-dev \
-    zlib1g-dev \
-    libzip-dev \
-    unzip \
-    && docker-php-ext-install -j$(nproc) intl pdo_mysql zip
-
-# Configure apache
-RUN a2enmod rewrite && \
-    service apache2 restart
-
-RUN echo "DocumentRoot /var/www/html/public" >> /etc/apache2/apache2.conf
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-# Définir le répertoire de travail
-WORKDIR /var/www/html
 
-# Copier les fichiers de l'application dans le conteneur
+RUN apt-get update \
+    && apt-get install -qq -y --no-install-recommends \
+    cron \
+     vim \
+     locales coreutils apt-utils git libicu-dev g++ libpng-dev libxml2-dev libzip-dev libonig-dev libxslt-dev;
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    echo "fr_FR.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen
+
+RUN curl -sSk https://getcomposer.org/installer | php -- --disable-tls && \
+   mv composer.phar /usr/local/bin/composer
+
+RUN docker-php-ext-configure intl
+RUN docker-php-ext-install pdo pdo_mysql mysqli gd opcache intl zip calendar dom mbstring zip gd xsl && a2enmod rewrite
+RUN pecl install apcu && docker-php-ext-enable apcu
+    
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions amqp
+
+WORKDIR /var/www
 COPY . .
-
-# Installer les dépendances Symfony
-RUN curl -sSkk https://getcomposer.org/installer | php -- --disable-tls
-RUN mv    composer.phar /usr/local/bin/composer
-
-# Expose le port 80
-EXPOSE 80
-
-# Commande pour lancer Apache
-CMD ["apache2-foreground"]
+RUN chown -R www-data:www-data /var/www/storage
+COPY ./php/vhosts.conf /etc/apache2/sites-available/000-default.conf
