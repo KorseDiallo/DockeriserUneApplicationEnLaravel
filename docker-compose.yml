@@ -1,7 +1,8 @@
+version: "3.8"
 services:
     db:
         image: mysql
-        container_name: mysql_container
+        container_name: db_docker_laravel
         restart: always
         volumes:
             - db-data:/var/lib/mysql
@@ -21,10 +22,10 @@ services:
             PMA_HOST: db
         networks:
             - dev
-
+    # Symfony apache project container
     www:
         build: php
-        container_name: laravel_container
+        container_name: www_docker_laravel
         ports:
             - "8741:80"
         volumes:
@@ -35,8 +36,6 @@ services:
             - dev
 networks:
     dev:
+
 volumes:
     db-data:
-
-
-
