@@ -19,7 +19,7 @@ class BienController extends Controller
     public function indexfirst()
     {
         $biens = bien::all();
-        return view('/admin/dashboard', compact('biens'));
+        // return view('/admin/dashboard', compact('biens'));
     }
     public function index()
     {
@@ -50,22 +50,22 @@ class BienController extends Controller
         $biens = new bien();
         $request->validate(
             [
-                'nombien' => 'required|min:2|max:25',
-                'categori' => 'required',
+                'nom' => 'required|min:2|max:25',
+                'categorie' => 'required',
                 'adresse' => 'required',
                 'image' => 'required',
                 'description' => 'required',
-                'status' => 'required',
+                'statu' => 'required',
             ]
         );
 
-        $biens->nom = $request->nombien;
-        $biens->categorie = $request->categori;
+        $biens->nom = $request->nom;
+        $biens->categorie = $request->categorie;
         $biens->image = $request->image;
         $biens->description = $request->description;
-        $biens->statu = $request->status;
+        $biens->statu = $request->statu;
         $biens->adresse = $request->adresse;
-        $biens->datePublication = $request->datepub;
+        $biens->datePublication = $request->datePublication;
         if ($biens->save()) {
             return redirect('/dashboard/admin');
         } else {
@@ -134,7 +134,6 @@ class BienController extends Controller
     {
         $biens = bien::FindOrFail($request->id);
         if ($biens->delete()) {
-
             return redirect('/dashboard/admin');
         }
     }

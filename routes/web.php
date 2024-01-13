@@ -7,7 +7,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
-
+Route::post('/savebien', [BienController::class, 'store']);
+Route::get('/delete/produit/{id}', [BienController::class, 'delete']);
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,21 +26,22 @@ Route::get('/', [BienvenuController::class, 'index']);
 
 Route::get('/dashboard', [UsersController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/dashboard/admin', [BienController::class, 'indexfirst'])->middleware(['admin'])->name('admin.dashboard');
+Route::get('/dashboard/admin', [BienController::class, 'indexfirst']);
+//->middleware(['admin'])->name('admin.dashboard');
 
-Route::middleware('admin')->group(function () {
-    Route::get('/ajout/bien', [BienController::class, 'index'])->name('admin.ajoutbien');
+
+    Route::get('/ajout/bien', [BienController::class, 'index']);
     Route::get('/detail/produit/{id}', [BienController::class, 'create']);
-    Route::post('/savebien', [BienController::class, 'store']);
+
     Route::post('/update/bien/{id}', [BienController::class, 'update']);
     Route::get('/commentaire/admin/suppression/{commentaire}', [BienController::class, 'deletes']);
 
     Route::get('/back', function () {
         return redirect('/dashboard/admin');
     });
-    Route::get('/delete/produit/{id}', [BienController::class, 'delete']);
+
     Route::get('/modifier/produit/{id}', [BienController::class, 'edit']);
-});
+
 
 Route::middleware('auth')->group(function () {
 
